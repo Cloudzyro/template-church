@@ -1,0 +1,70 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import ContactForm from "../components/ContactForm.astro";
+import { site } from "../data/site";
+---
+
+<Base title="Contact and prayer" description={`Get in touch or send a prayer request to ${site.name}.`}>
+  <PageHero
+    eyebrow="Contact and prayer"
+    title="We're here for you"
+    text="Have a question, want to get involved, or need someone to pray with you? Send us a note. Prayer requests go to our pastors and prayer team, and you can keep yours private."
+  />
+  <section class="section">
+    <div class="wrap grid">
+      <div>
+        <h2 class="visually-hidden">Send a message</h2>
+        <ContactForm />
+      </div>
+      <aside class="card side">
+        <h2>Other ways to reach us</h2>
+        <p>
+          <strong>Call the office</strong><br />
+          <a href={`tel:${site.phone.replace(/[^\d+]/g, "")}`}>{site.phone}</a><br />
+          Tuesday to Friday, 9am to 4pm
+        </p>
+        <p>
+          <strong>Email</strong><br />
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </p>
+        <p>
+          <strong>Stop by</strong><br />
+          {site.address.street}<br />
+          {`${site.address.city}, ${site.address.region} ${site.address.postal}`}
+        </p>
+        <p class="urgent">
+          In an emergency, please call 911. If you're in crisis, call or text 988 to reach the Suicide and Crisis Lifeline, any
+          time.
+        </p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .side h2 {
+    font-size: 1.6rem;
+  }
+  .side {
+    background: var(--sand);
+  }
+  .urgent {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,374 @@
+---
+import Base from "../layouts/Base.astro";
+import HeroArt from "../components/HeroArt.astro";
+import Icon from "../components/Icon.astro";
+import SermonCard from "../components/SermonCard.astro";
+import EventList from "../components/EventList.astro";
+import { site, services, home, visit, sermons, ministries, give } from "../data/site";
+
+const latest = sermons[0];
+---
+
+<Base>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">{site.tagline}</span>
+        <h1>{home.heroTitle}</h1>
+        <p class="lede">{home.heroText}</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="/visit/">Plan your visit</a>
+          <a class="btn btn-ghost" href="/sermons/">Watch a sermon</a>
+        </div>
+        <p class="sunday">
+          <Icon name="clock" size={20} />
+          <span><strong>Sundays at 9 and 11am</strong> at {site.address.street}, {site.address.city}</span>
+        </p>
+      </div>
+      <div class="hero-visual">
+        <HeroArt />
+      </div>
+    </div>
+  </section>
+
+  <section class="times-band" aria-labelledby="times-title">
+    <div class="wrap">
+      <h2 id="times-title" class="visually-hidden">Service times</h2>
+      <ul class="times">
+        {
+          services.map((s) => (
+            <li>
+              <span class="day">{s.day}</span>
+              <span class="time">{s.time}</span>
+              <span class="name">{s.name}</span>
+              <span class="note">{s.note}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section welcome" aria-labelledby="welcome-title">
+    <div class="wrap welcome-grid">
+      <div>
+        <span class="eyebrow">New here?</span>
+        <h2 id="welcome-title">{home.welcomeTitle}</h2>
+        {home.welcomeText.map((p) => <p class="lede">{p}</p>)}
+        <a class="btn btn-primary" href="/visit/">What to expect on Sunday</a>
+      </div>
+      <ul class="expect">
+        {
+          visit.expect.map((e) => (
+            <li>
+              <span class="icon-wrap">
+                <Icon name={e.icon} />
+              </span>
+              <h3>{e.title}</h3>
+              <p>{e.text.split(". ")[0]}.</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section latest" aria-labelledby="latest-title">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <span class="eyebrow">Latest message</span>
+          <h2 id="latest-title">Catch up on Sunday</h2>
+        </div>
+        <a href="/sermons/">All sermons</a>
+      </div>
+      <SermonCard sermon={latest} featured />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="events-title">
+    <div class="wrap events-grid">
+      <div>
+        <span class="eyebrow">Coming up</span>
+        <h2 id="events-title">Life together</h2>
+        <p class="lede">Dinners, workshops, service projects and celebrations. There's always a way to jump in.</p>
+        <a class="btn btn-ghost" href="/events/">See the full calendar</a>
+      </div>
+      <EventList limit={3} />
+    </div>
+  </section>
+
+  <section class="section ministries" aria-labelledby="min-title">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <span class="eyebrow">Get connected</span>
+          <h2 id="min-title">A place for every age</h2>
+        </div>
+        <a href="/ministries/">All ministries</a>
+      </div>
+      <ul class="min-grid">
+        {
+          ministries.map((m) => (
+            <li>
+              <span class="icon-wrap">
+                <Icon name={m.icon} />
+              </span>
+              <h3>{m.name}</h3>
+              <p class="aud">{m.audience}</p>
+              <p>{m.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section give-band" aria-labelledby="give-title">
+    <div class="wrap give-box">
+      <div>
+        <span class="eyebrow">Giving</span>
+        <h2 id="give-title">{give.title}</h2>
+        <p>{give.text}</p>
+      </div>
+      <div class="give-actions">
+        <a class="btn btn-gold" href={site.giveUrl}>
+          <Icon name="gift" size={20} />
+          {site.giveLabel}
+        </a>
+        <a class="pray" href="/contact/?type=prayer">Or send us a prayer request</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(40px, 7vw, 88px) clamp(48px, 7vw, 80px);
+    background:
+      radial-gradient(50% 60% at 90% 10%, rgb(226 180 92 / 0.25), transparent 70%),
+      var(--cream);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(24px, 5vw, 64px);
+    align-items: center;
+  }
+  h1 {
+    color: var(--forest);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.75rem 0 1.5rem;
+  }
+  .btn-ghost {
+    color: var(--forest);
+  }
+  .sunday {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--muted);
+    margin: 0;
+  }
+  .sunday :global(svg) {
+    color: var(--clay);
+    flex: none;
+  }
+  .sunday strong {
+    color: var(--ink);
+  }
+
+  .times-band {
+    padding-bottom: clamp(24px, 4vw, 40px);
+  }
+  .times {
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: var(--forest);
+    border-radius: calc(var(--radius) + 10px);
+  }
+  .times li {
+    display: grid;
+    gap: 0.1rem;
+    padding: 20px 22px;
+    border-radius: var(--radius);
+    background: #30593d;
+    color: #dfe8d9;
+  }
+  .times li:first-child {
+    background: var(--gold);
+    color: var(--ink);
+  }
+  .day {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .time {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .times li:first-child .time {
+    color: var(--forest);
+  }
+  .name {
+    font-weight: 700;
+  }
+  .note {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  .welcome-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 6vw, 72px);
+    align-items: center;
+  }
+  .expect,
+  .min-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .expect li,
+  .min-grid li {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+  .expect li:nth-child(2),
+  .expect li:nth-child(3) {
+    background: var(--sand);
+  }
+  .expect p,
+  .min-grid p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.97rem;
+  }
+  .icon-wrap {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    background: var(--forest);
+    color: var(--gold-soft);
+    margin-bottom: 0.9rem;
+  }
+
+  .latest {
+    background: var(--sand);
+    border-radius: 40px;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .head h2 {
+    margin: 0;
+  }
+  .head a {
+    font-weight: 700;
+  }
+
+  .events-grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(32px, 6vw, 72px);
+    align-items: start;
+  }
+
+  .ministries {
+    padding-top: 0;
+  }
+  .min-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .aud {
+    font-weight: 700;
+    color: var(--clay) !important;
+    margin-bottom: 0.4rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .give-band {
+    padding-top: 0;
+  }
+  .give-box {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    align-items: center;
+    gap: 2rem;
+    background:
+      radial-gradient(circle at 100% 0%, rgb(226 180 92 / 0.35), transparent 45%),
+      var(--forest);
+    color: #dfe8d9;
+    border-radius: 40px;
+    padding: clamp(28px, 5vw, 64px);
+  }
+  .give-box h2 {
+    color: #fff;
+  }
+  .give-box .eyebrow {
+    color: var(--gold);
+  }
+  .give-box p {
+    margin: 0;
+    max-width: 52ch;
+  }
+  .give-actions {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .pray {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid,
+    .welcome-grid,
+    .events-grid,
+    .give-box {
+      grid-template-columns: 1fr;
+    }
+    .hero-visual {
+      max-width: 440px;
+      margin-inline: auto;
+      width: 100%;
+    }
+    .times,
+    .min-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .times,
+    .min-grid,
+    .expect {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

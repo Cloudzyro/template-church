@@ -1,0 +1,233 @@
+---
+// Sends to PUBLIC_FORM_ENDPOINT (Formspree, Basin, a Supabase function or similar).
+// With no endpoint set, the form opens the visitor's email app instead.
+import { site } from "../data/site";
+
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? "";
+---
+
+<form
+  class="contact-form"
+  method="post"
+  action={endpoint || `mailto:${site.email}`}
+  data-endpoint={endpoint}
+  data-email={site.email}
+  data-church={site.shortName}
+>
+  {
+    !endpoint && (
+      <p class="note" role="note">
+        This form isn't connected yet, so sending it opens your email app. You can also write to us at{" "}
+        <a href={`mailto:${site.email}`}>{site.email}</a>.
+      </p>
+    )
+  }
+  <input type="hidden" name="_subject" value={`Message for ${site.shortName}`} />
+  <fieldset class="type">
+    <legend>How can we help?</legend>
+    <label class="choice">
+      <input type="radio" name="request_type" value="Contact" checked />
+      <span>Get in touch</span>
+    </label>
+    <label class="choice">
+      <input type="radio" name="request_type" value="Prayer request" />
+      <span>Share a prayer request</span>
+    </label>
+  </fieldset>
+  <div class="row">
+    <label>
+      <span>Your name</span>
+      <input name="name" autocomplete="name" required />
+    </label>
+    <label>
+      <span>Email</span>
+      <input name="email" type="email" autocomplete="email" required />
+    </label>
+  </div>
+  <label>
+    <span>Phone <small>(optional)</small></span>
+    <input name="phone" type="tel" autocomplete="tel" />
+  </label>
+  <label>
+    <span data-message-label>Your message</span>
+    <textarea name="message" rows="6" required></textarea>
+  </label>
+  <label class="check" data-private hidden>
+    <input type="checkbox" name="keep_private" value="Yes, pastors only" />
+    <span>Keep this private. Only our pastors will see it, not the wider prayer team.</span>
+  </label>
+  <button class="btn btn-primary" type="submit">Send</button>
+  <p class="status" role="status" aria-live="polite"></p>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>("form.contact-form").forEach((form) => {
+    const status = form.querySelector<HTMLElement>(".status")!;
+    const privateBox = form.querySelector<HTMLElement>("[data-private]")!;
+    const messageLabel = form.querySelector<HTMLElement>("[data-message-label]")!;
+    const subject = form.querySelector<HTMLInputElement>("input[name=_subject]")!;
+    const church = form.dataset.church ?? "";
+
+    const sync = () => {
+      const prayer = form.querySelector<HTMLInputElement>("input[name=request_type]:checked")?.value === "Prayer request";
+      privateBox.hidden = !prayer;
+      messageLabel.textContent = prayer ? "How can we pray for you?" : "Your message";
+      subject.value = prayer ? `Prayer request for ${church}` : `Message for ${church}`;
+    };
+    if (new URLSearchParams(location.search).get("type") === "prayer") {
+      form.querySelector<HTMLInputElement>("input[value='Prayer request']")!.checked = true;
+    }
+    form.querySelectorAll("input[name=request_type]").forEach((r) => r.addEventListener("change", sync));
+    sync();
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const { endpoint, email } = form.dataset;
+      const data = new FormData(form);
+
+      if (!endpoint) {
+        const lines = [...data.entries()]
+          .filter(([key]) => !key.startsWith("_"))
+          .map(([key, value]) => `${key.replace(/_/g, " ")}: ${value}`);
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject.value)}&body=${encodeURIComponent(lines.join("\n"))}`;
+        status.textContent = "Your email app should open with your message filled in.";
+        return;
+      }
+
+      const button = form.querySelector<HTMLButtonElement>("button[type=submit]")!;
+      button.disabled = true;
+      status.textContent = "Sending...";
+      try {
+        const res = await fetch(endpoint, { method: "POST", body: data, headers: { Accept: "application/json" } });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        sync();
+        status.textContent = "Thank you. We've received your message and someone from our team will be in touch.";
+      } catch {
+        status.innerHTML = "";
+        status.append("Sorry, that didn't send. Please email us at ");
+        const link = Object.assign(document.createElement("a"), { href: `mailto:${email}`, textContent: email });
+        status.append(link, ".");
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+</script>
+
+<style>
+  .contact-form {
+    display: grid;
+    gap: 1.1rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(20px, 4vw, 36px);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.1rem;
+  }
+  label {
+    display: grid;
+    gap: 0.4rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  label[hidden] {
+    display: none;
+  }
+  small {
+    font-weight: 500;
+    color: var(--muted);
+  }
+  input:not([type="radio"], [type="checkbox"]),
+  textarea {
+    width: 100%;
+    font: inherit;
+    font-weight: 500;
+    color: var(--ink);
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 0.75rem 0.9rem;
+    min-height: 48px;
+  }
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid var(--clay);
+    outline-offset: 1px;
+  }
+  .type {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  legend {
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    padding: 0;
+  }
+  .choice {
+    position: relative;
+    display: block;
+  }
+  .choice input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .choice span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-weight: 700;
+  }
+  .choice input:checked + span {
+    background: var(--forest);
+    border-color: var(--forest);
+    color: #fff;
+  }
+  .choice input:focus-visible + span {
+    outline: 3px solid var(--clay);
+    outline-offset: 2px;
+  }
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-weight: 500;
+  }
+  .check input {
+    width: 20px;
+    height: 20px;
+    margin-top: 0.15rem;
+    accent-color: var(--forest);
+    flex: none;
+  }
+  .note {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+    background: var(--gold-soft);
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+  .status {
+    margin: 0;
+    font-weight: 600;
+    min-height: 1.5em;
+  }
+  button {
+    justify-self: start;
+  }
+</style>

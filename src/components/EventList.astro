@@ -1,0 +1,184 @@
+---
+// Events grouped by month. Past events are hidden in the visitor's browser,
+// so the list stays current between rebuilds.
+import Icon from "./Icon.astro";
+import { events as allEvents } from "../data/site";
+import { dayParts, monthYear } from "../lib/format";
+
+interface Props {
+  limit?: number;
+}
+const { limit } = Astro.props;
+const sorted = [...allEvents].sort((a, b) => a.date.localeCompare(b.date));
+const list = limit ? sorted.slice(0, limit + 3) : sorted;
+const groups = new Map<string, typeof sorted>();
+for (const e of list) {
+  const key = monthYear(e.date);
+  groups.set(key, [...(groups.get(key) ?? []), e]);
+}
+---
+
+<div class="events" data-events data-limit={limit ?? ""}>
+  {
+    [...groups.entries()].map(([month, items]) => (
+      <section class="month" aria-label={month}>
+        <h3 class="month-title">{month}</h3>
+        <ul>
+          {items.map((e) => {
+            const d = dayParts(e.date);
+            return (
+              <li class="event" data-date={e.date}>
+                <div class="date" aria-hidden="true">
+                  <span class="wk">{d.weekday}</span>
+                  <span class="num">{d.day}</span>
+                  <span class="mo">{d.month}</span>
+                </div>
+                <div class="info">
+                  <h4>{e.title}</h4>
+                  <p class="where">
+                    <span>
+                      <Icon name="calendar" size={16} />
+                      <time datetime={e.date}>{`${d.weekday}, ${d.month} ${d.day}`}</time>
+                    </span>
+                    <span>
+                      <Icon name="clock" size={16} />
+                      {e.time}
+                    </span>
+                    <span>
+                      <Icon name="pin" size={16} />
+                      {e.location}
+                    </span>
+                  </p>
+                  <p>{e.description}</p>
+                  {e.link && (
+                    <a class="signup" href={e.link}>
+                      Sign up<span class="visually-hidden"> for {e.title}</span>
+                    </a>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))
+  }
+  <p class="empty" hidden>New events are on the way. Check back soon, or join us this Sunday.</p>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-events]").forEach((root) => {
+    const today = new Date();
+    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    const limit = Number(root.dataset.limit) || Infinity;
+    let shown = 0;
+    root.querySelectorAll<HTMLElement>(".event").forEach((ev) => {
+      const past = (ev.dataset.date ?? "") < iso;
+      const hide = past || shown >= limit;
+      ev.hidden = hide;
+      if (!hide) shown++;
+    });
+    root.querySelectorAll<HTMLElement>(".month").forEach((m) => {
+      m.hidden = !m.querySelector(".event:not([hidden])");
+    });
+    root.querySelector<HTMLElement>(".empty")!.hidden = shown > 0;
+  });
+</script>
+
+<style>
+  .events {
+    display: grid;
+    gap: 2rem;
+  }
+  .month-title {
+    font-size: 1.1rem;
+    font-family: var(--font-body);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--forest);
+    margin-bottom: 0.9rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+  .event {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    gap: 1.25rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .event[hidden],
+  .month[hidden] {
+    display: none;
+  }
+  .date {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    background: var(--sand);
+    border-radius: 18px;
+    padding: 0.6rem 0;
+    height: fit-content;
+    line-height: 1.1;
+  }
+  .wk,
+  .mo {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .num {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--forest);
+    margin: 0.15rem 0;
+  }
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin: 0 0 0.4rem;
+  }
+  .where {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .where span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .info p:last-of-type {
+    margin-bottom: 0.25rem;
+  }
+  .signup {
+    font-weight: 700;
+  }
+  .empty {
+    margin: 0;
+  }
+  @media (max-width: 480px) {
+    .event {
+      grid-template-columns: 64px 1fr;
+      gap: 0.9rem;
+      padding: 14px;
+    }
+    .num {
+      font-size: 1.6rem;
+    }
+  }
+</style>

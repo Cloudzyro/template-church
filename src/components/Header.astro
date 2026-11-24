@@ -1,0 +1,200 @@
+---
+import Logo from "./Logo.astro";
+import { site } from "../data/site";
+
+const links = [
+  { href: "/visit/", label: "Plan a visit" },
+  { href: "/sermons/", label: "Sermons" },
+  { href: "/events/", label: "Events" },
+  { href: "/ministries/", label: "Ministries" },
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
+];
+const path = Astro.url.pathname.replace(/\/?$/, "/");
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href="/" aria-label={`${site.name}, home`}>
+      <Logo />
+      <span class="brand-text">
+        <span class="brand-name">{site.shortName}</span>
+        <span class="brand-sub">Community Church</span>
+      </span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="visually-hidden">Open menu</span>
+      <span class="bars" aria-hidden="true"></span>
+    </button>
+    <nav id="site-nav" class="nav" aria-label="Main">
+      <ul>
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} aria-current={path === l.href ? "page" : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="btn btn-gold nav-cta" href={site.giveUrl}>{site.giveLabel}</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>(".menu-toggle");
+  const nav = document.getElementById("site-nav");
+  toggle?.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!open));
+    toggle.querySelector(".visually-hidden")!.textContent = open ? "Open menu" : "Close menu";
+    nav?.classList.toggle("open", !open);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && nav?.classList.contains("open")) {
+      toggle?.click();
+      toggle?.focus();
+    }
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--cream) 90%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 76px;
+    gap: 1rem;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .brand-text {
+    display: grid;
+    line-height: 1.1;
+  }
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--forest);
+  }
+  .brand-sub {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .nav ul {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav ul a {
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+  }
+  .nav ul a:hover {
+    background: var(--sand);
+  }
+  .nav ul a[aria-current="page"] {
+    background: var(--forest);
+    color: #fff;
+  }
+  .menu-toggle {
+    display: none;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    background: var(--sand);
+    color: var(--forest);
+    cursor: pointer;
+    border-radius: 14px;
+  }
+  .bars,
+  .bars::before,
+  .bars::after {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    margin: 0 auto;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+  .bars::before,
+  .bars::after {
+    content: "";
+    position: absolute;
+    left: 0;
+  }
+  .bars::before {
+    top: -7px;
+  }
+  .bars::after {
+    top: 7px;
+  }
+  [aria-expanded="true"] .bars {
+    background: transparent;
+  }
+  [aria-expanded="true"] .bars::before {
+    transform: translateY(7px) rotate(45deg);
+  }
+  [aria-expanded="true"] .bars::after {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  @media (max-width: 1020px) {
+    .menu-toggle {
+      display: block;
+    }
+    .nav {
+      display: none;
+      position: absolute;
+      inset: 76px 0 auto 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+      padding: 1rem var(--gutter) 1.5rem;
+      background: var(--cream);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 24px 40px -24px rgb(31 42 34 / 0.4);
+    }
+    .nav.open {
+      display: flex;
+    }
+    .nav ul {
+      flex-direction: column;
+    }
+    .nav ul a {
+      padding: 0.85rem 1rem;
+      font-size: 1.15rem;
+    }
+  }
+</style>

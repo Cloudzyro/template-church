@@ -1,0 +1,111 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import { site, staff, home } from "../data/site";
+import { initials } from "../lib/format";
+
+const tones = ["#24442f", "#b85c3a", "#30593d", "#9a6b2a", "#3d6b4a", "#7a4a5a"];
+---
+
+<Base title="About and staff" description={`The story and people of ${site.name}.`}>
+  <PageHero eyebrow="About us" title="Ordinary people, extraordinary grace">
+    {home.welcomeText.map((p) => <p class="lede">{p}</p>)}
+  </PageHero>
+  <section class="section">
+    <div class="wrap">
+      <span class="eyebrow">Our team</span>
+      <h2>The people you'll meet</h2>
+      <ul class="staff">
+        {
+          staff.map((p, i) => (
+            <li>
+              <svg class="avatar" viewBox="0 0 120 120" role="img" aria-label={`Illustrated avatar for ${p.name}`}>
+                <rect width="120" height="120" rx="44" fill={tones[i % tones.length]} />
+                <circle cx="96" cy="22" r="14" fill="#e2b45c" opacity=".8" />
+                <text x="60" y="74" text-anchor="middle" font-family="Young Serif, Georgia, serif" font-size="42" fill="#fffbf3">
+                  {initials(p.name)}
+                </text>
+              </svg>
+              <div>
+                <h3>{p.name}</h3>
+                <p class="role">{p.role}</p>
+                <p>{p.bio}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+  <section class="section beliefs">
+    <div class="wrap belief-box">
+      <div>
+        <span class="eyebrow">What we believe</span>
+        <h2>Rooted in Jesus, open to all</h2>
+      </div>
+      <p>
+        We're a non-denominational Christian church. We believe God made us, loves us and has made a way home through
+        Jesus. We read the Bible together, we pray, and we try to love our neighbors in practical ways. We'd love to talk
+        about any of it over coffee.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .staff {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 18px;
+  }
+  .staff li {
+    display: flex;
+    gap: 1.1rem;
+    align-items: flex-start;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+  .avatar {
+    width: 88px;
+    flex: none;
+  }
+  h3 {
+    margin: 0;
+  }
+  .role {
+    font-weight: 700;
+    color: var(--clay);
+    margin: 0.15rem 0 0.5rem;
+  }
+  .staff p:last-child {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.97rem;
+  }
+  .beliefs {
+    padding-top: 0;
+  }
+  .belief-box {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+    align-items: center;
+    background: var(--sand);
+    border-radius: 40px;
+    padding: clamp(28px, 5vw, 56px);
+  }
+  .belief-box p {
+    margin: 0;
+    font-size: 1.12rem;
+  }
+  @media (max-width: 800px) {
+    .belief-box {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

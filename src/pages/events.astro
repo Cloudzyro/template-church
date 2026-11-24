@@ -1,0 +1,25 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import EventList from "../components/EventList.astro";
+import { site } from "../data/site";
+---
+
+<Base title="Events" description={`Upcoming events, dinners and celebrations at ${site.name}.`}>
+  <PageHero
+    eyebrow="Events calendar"
+    title="What's happening"
+    text="Everyone is welcome at every event unless it says otherwise. Bring a friend."
+  />
+  <section class="section">
+    <div class="wrap narrow">
+      <EventList />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow {
+    max-width: 860px;
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import SermonCard from "../components/SermonCard.astro";
+import { site, sermons } from "../data/site";
+
+const [latest, ...rest] = sermons;
+---
+
+<Base title="Sermons" description={`Watch and listen to recent messages from ${site.name}.`}>
+  <PageHero
+    eyebrow="Sermons"
+    title="Watch or listen anytime"
+    text="Missed a Sunday, or want to hear it again? Recent messages are below. Videos and audio only load when you press play."
+  >
+    {site.watchUrl && <a class="btn btn-gold live" href={site.watchUrl}>Watch Sundays live at 11am</a>}
+  </PageHero>
+  <section class="section">
+    <div class="wrap">
+      <h2 class="visually-hidden">Latest sermon</h2>
+      <SermonCard sermon={latest} featured />
+      <h2 class="more">Earlier messages</h2>
+      <div class="grid">
+        {rest.map((s) => <SermonCard sermon={s} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .live {
+    margin-top: 1.5rem;
+  }
+  .more {
+    margin-top: clamp(48px, 7vw, 80px);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 20px;
+  }
+</style>

@@ -1,0 +1,252 @@
+---
+// Nothing from YouTube or your audio host loads until the visitor presses play.
+import Icon from "./Icon.astro";
+import type { Sermon } from "../data/site";
+import { longDate } from "../lib/format";
+
+interface Props {
+  sermon: Sermon;
+  featured?: boolean;
+}
+const { sermon, featured = false } = Astro.props;
+const hasVideo = Boolean(sermon.youtubeId);
+const hasAudio = Boolean(sermon.audioUrl);
+---
+
+<article class:list={["sermon", { featured }]}>
+  <div
+    class="player"
+    data-player
+    data-youtube={sermon.youtubeId ?? ""}
+    data-audio={sermon.audioUrl ?? ""}
+    data-title={sermon.title}
+  >
+    <div class="poster" aria-hidden="true">
+      <span class="series">{sermon.series}</span>
+      <span class="poster-title">{sermon.title}</span>
+      <span class="ref">{sermon.scripture}</span>
+    </div>
+    <div class="controls">
+      {
+        hasVideo && (
+          <button class="play" type="button" data-kind="video">
+            <Icon name="play" size={20} />
+            Watch<span class="visually-hidden"> {sermon.title}</span>
+          </button>
+        )
+      }
+      {
+        hasAudio && (
+          <button class="play alt" type="button" data-kind="audio">
+            <Icon name="listen" size={20} />
+            Listen<span class="visually-hidden"> to {sermon.title}</span>
+          </button>
+        )
+      }
+    </div>
+    {hasVideo && <p class="privacy">Video plays from YouTube when you press Watch.</p>}
+  </div>
+  <div class="body">
+    <p class="meta">
+      <time datetime={sermon.date}>{longDate(sermon.date)}</time>
+      <span aria-hidden="true">&middot;</span>
+      {sermon.speaker}
+    </p>
+    {featured ? <h3 class="title big">{sermon.title}</h3> : <h3 class="title">{sermon.title}</h3>}
+    <p class="scripture">{sermon.scripture} &middot; {sermon.series}</p>
+    <p class="summary">{sermon.summary}</p>
+  </div>
+</article>
+
+<script>
+  const validId = /^[A-Za-z0-9_-]{11}$/;
+  document.querySelectorAll<HTMLElement>("[data-player]").forEach((player) => {
+    player.querySelectorAll<HTMLButtonElement>("button[data-kind]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const { youtube = "", audio = "", title = "Sermon" } = player.dataset;
+        const kind = button.dataset.kind;
+        if (kind === "video") {
+          if (!validId.test(youtube)) {
+            const note = document.createElement("p");
+            note.className = "pending";
+            note.setAttribute("role", "status");
+            note.textContent = "This video will appear here once its YouTube ID is added to the sermon list.";
+            player.querySelector(".pending")?.remove();
+            player.append(note);
+            return;
+          }
+          const frame = document.createElement("iframe");
+          frame.src = `https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1&rel=0`;
+          frame.title = title;
+          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+          frame.allowFullscreen = true;
+          player.replaceChildren(frame);
+          player.classList.add("is-video");
+          frame.focus();
+        } else {
+          const el = document.createElement("audio");
+          el.controls = true;
+          el.autoplay = true;
+          el.preload = "none";
+          el.src = audio;
+          el.setAttribute("aria-label", title);
+          el.addEventListener("error", () => {
+            const note = document.createElement("p");
+            note.className = "pending";
+            note.setAttribute("role", "status");
+            note.textContent = "This recording isn't available yet. Please check back soon.";
+            player.append(note);
+          });
+          player.querySelector(".controls")?.replaceChildren(el);
+          player.querySelector(".privacy")?.remove();
+          el.focus();
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .sermon {
+    display: grid;
+    gap: 1rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
+  }
+  .sermon.featured {
+    grid-template-columns: 1.15fr 1fr;
+    align-items: center;
+    gap: clamp(16px, 3vw, 40px);
+  }
+  .player {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: calc(var(--radius) - 8px);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 85% 20%, rgb(226 180 92 / 0.55), transparent 40%),
+      radial-gradient(circle at 10% 100%, rgb(169 191 160 / 0.5), transparent 50%),
+      var(--forest);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(14px, 2.5vw, 24px);
+  }
+  .player.is-video {
+    padding: 0;
+  }
+  .player :global(iframe) {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .poster {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .series {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+  }
+  .poster-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+    line-height: 1.1;
+    max-width: 16ch;
+  }
+  .ref {
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .controls :global(audio) {
+    width: 100%;
+  }
+  .play {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0.5rem 1.1rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--gold);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .play.alt {
+    background: #fff;
+  }
+  .play:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+  .privacy {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    margin: 0;
+    font-size: 0.72rem;
+    opacity: 0.75;
+    max-width: 18ch;
+    text-align: right;
+    line-height: 1.3;
+  }
+  .player :global(.pending) {
+    margin: 0.5rem 0 0;
+    background: rgb(0 0 0 / 0.35);
+    border-radius: 12px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  .body {
+    padding: 4px 10px 10px;
+  }
+  .meta {
+    margin: 0 0 0.35rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .title {
+    margin: 0 0 0.35rem;
+  }
+  .title.big {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+  }
+  .scripture {
+    margin: 0 0 0.6rem;
+    font-weight: 700;
+    color: var(--clay);
+    font-size: 0.95rem;
+  }
+  .summary {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+  @media (max-width: 820px) {
+    .sermon.featured {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 420px) {
+    .privacy {
+      display: none;
+    }
+  }
+</style>
