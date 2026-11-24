@@ -8,11 +8,6 @@ const { eyebrow, title, text } = Astro.props;
 ---
 
 <section class="page-hero">
-  <svg class="arc" viewBox="0 0 400 400" aria-hidden="true">
-    <circle cx="200" cy="200" r="180" fill="none" stroke="#e2b45c" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"></circle>
-    <circle cx="200" cy="200" r="130" fill="#30593d"></circle>
-    <circle cx="200" cy="200" r="70" fill="#e2b45c" opacity=".9"></circle>
-  </svg>
   <div class="wrap inner">
     <span class="eyebrow">{eyebrow}</span>
     <h1>{title}</h1>
@@ -28,14 +23,7 @@ const { eyebrow, title, text } = Astro.props;
     background: var(--forest);
     color: #e9efe4;
     padding-block: clamp(56px, 9vw, 104px) clamp(48px, 7vw, 80px);
-    border-radius: 0 0 40px 40px;
-  }
-  .arc {
-    position: absolute;
-    right: -120px;
-    top: -110px;
-    width: 420px;
-    opacity: 0.55;
+    border-radius: 0 0 28px 28px;
   }
   .inner {
     position: relative;

@@ -125,10 +125,7 @@ const hasAudio = Boolean(sermon.audioUrl);
     aspect-ratio: 16 / 9;
     border-radius: calc(var(--radius) - 8px);
     overflow: hidden;
-    background:
-      radial-gradient(circle at 85% 20%, rgb(226 180 92 / 0.55), transparent 40%),
-      radial-gradient(circle at 10% 100%, rgb(169 191 160 / 0.5), transparent 50%),
-      var(--forest);
+    background: var(--forest);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -148,10 +145,8 @@ const hasAudio = Boolean(sermon.audioUrl);
     gap: 0.25rem;
   }
   .series {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: var(--gold-soft);
   }
   .poster-title {
@@ -180,19 +175,22 @@ const hasAudio = Boolean(sermon.audioUrl);
     min-height: 44px;
     padding: 0.5rem 1.1rem;
     border: 0;
-    border-radius: 999px;
+    border-radius: 10px;
     background: var(--gold);
     color: var(--ink);
     font: inherit;
-    font-weight: 700;
+    font-weight: 600;
+    transition: background-color 0.16s var(--ease);
     cursor: pointer;
   }
   .play.alt {
     background: #fff;
   }
   .play:hover {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
+    background: #ecc576;
+  }
+  .play.alt:hover {
+    background: var(--paper);
   }
   .privacy {
     position: absolute;
@@ -231,7 +229,7 @@ const hasAudio = Boolean(sermon.audioUrl);
   }
   .scripture {
     margin: 0 0 0.6rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--clay);
     font-size: 0.95rem;
   }

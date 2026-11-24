@@ -36,7 +36,7 @@ export const services = [
 ];
 
 export const home = {
-  heroTitle: "There's a seat saved for you.",
+  heroTitle: "There's a seat saved for you",
   heroText:
     "Whether you've followed Jesus for decades or you're just curious, you're welcome here. Come as you are, bring your questions, and meet people who'd love to know you.",
   welcomeTitle: "Welcome home",
@@ -245,7 +245,7 @@ export const staff = [
 ];
 
 export const give = {
-  title: "Generosity changes lives",
+  title: "Where your giving goes",
   text: "Your giving supports our kids and youth ministries, the food pantry, the warming center and partners serving around the world. Thank you.",
   ways: ["Give online, once or every month", "Drop a gift in the boxes at the back of the sanctuary", "Mail a check to the church office"],
 };

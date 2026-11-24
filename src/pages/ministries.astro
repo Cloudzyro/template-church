@@ -18,7 +18,7 @@ import { site, ministries } from "../data/site";
           ministries.map((m, i) => (
             <li class={`tone-${i % 3}`}>
               <span class="icon-wrap">
-                <Icon name={m.icon} size={30} />
+                <Icon name={m.icon} size={22} />
               </span>
               <h2>{m.name}</h2>
               <p class="aud">{m.audience}</p>
@@ -51,15 +51,12 @@ import { site, ministries } from "../data/site";
     display: flex;
     flex-direction: column;
   }
-  .tone-1 {
-    background: var(--sand);
-  }
   h2 {
     font-size: 1.6rem;
     margin-bottom: 0.2rem;
   }
   .aud {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--clay);
     margin-bottom: 0.6rem;
   }
@@ -68,16 +65,11 @@ import { site, ministries } from "../data/site";
     color: var(--ink-soft);
   }
   li a {
-    font-weight: 700;
+    font-weight: 600;
   }
   .icon-wrap {
-    display: grid;
-    place-items: center;
-    width: 60px;
-    height: 60px;
-    border-radius: 20px;
-    background: var(--forest);
-    color: var(--gold-soft);
-    margin-bottom: 1rem;
+    display: block;
+    color: var(--forest-2);
+    margin-bottom: 12px;
   }
 </style>

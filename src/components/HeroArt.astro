@@ -1,17 +1,16 @@
 <svg class="hero-art" viewBox="0 0 560 520" role="img" aria-label="Illustration of a small white church on a green hill beside a large tree at sunrise">
   <defs>
-    <clipPath id="blob">
-      <path d="M280 10c120 0 250 40 268 170 16 116-40 250-160 300-110 46-260 40-340-50C-20 350-10 190 60 110 120 40 190 10 280 10z"></path>
+    <clipPath id="arch">
+      <path d="M30 520V260a250 250 0 0 1 500 0v260z"></path>
     </clipPath>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#f5dfae"></stop>
       <stop offset="1" stop-color="#f8eedb"></stop>
     </linearGradient>
   </defs>
-  <g clip-path="url(#blob)">
+  <g clip-path="url(#arch)">
     <rect width="560" height="520" fill="url(#sky)"></rect>
     <circle class="sun" cx="380" cy="190" r="70" fill="#e2b45c"></circle>
-    <circle cx="380" cy="190" r="110" fill="#e2b45c" opacity=".18"></circle>
     <g class="cloud" fill="#fffbf3">
       <rect x="90" y="110" width="110" height="28" rx="14"></rect>
       <rect x="120" y="92" width="56" height="32" rx="16"></rect>
@@ -60,14 +59,5 @@
   .hero-art {
     width: 100%;
     height: auto;
-    filter: drop-shadow(0 30px 40px rgb(36 68 47 / 0.18));
-  }
-  .cloud {
-    animation: drift 18s ease-in-out infinite alternate;
-  }
-  @keyframes drift {
-    to {
-      transform: translateX(40px);
-    }
   }
 </style>
